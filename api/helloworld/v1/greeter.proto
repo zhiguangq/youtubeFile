@@ -17,6 +17,13 @@ service Greeter {
       get: "/helloworld/{name}"
     };
   }
+
+  rpc CreateFile (HelloRequest) returns (HelloReply) {
+    option (google.api.http) = {
+      post: "/create"
+      body: "*"      
+    };
+  }
 }
 
 // The request message containing the user's name.
