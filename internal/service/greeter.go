@@ -1,6 +1,8 @@
 package service
 
 import (
+	"fmt"
+	"os/exec"
 	"context"
 
 	v1 "linode/api/helloworld/v1"
@@ -35,5 +37,14 @@ func (s *GreeterService) CreateFile(ctx context.Context, in *v1.HelloRequest) (*
 	if err != nil {
 		return nil, err
 	}
+	
+	cmd := exec.Command("yt-dlp", "-o","/var/www/html/%(id).150B.%(ext)s","-f" ,"140","-x","--audio-format","mp3",g.Hello)
+		
+        out, err1 := cmd.Output()
+        if err1 != nil {
+             fmt.Println(err1)
+        }    else {
+            fmt.Println(string(out))
+        }
 	return &v1.HelloReply{Message: "Create " + g.Hello}, nil
 }
