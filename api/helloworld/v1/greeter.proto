@@ -18,6 +18,12 @@ service Greeter {
     };
   }
 
+ rpc GetFile (HelloRequest) returns (HelloReply) {
+    option (google.api.http) = {
+      get: "/get"
+    };
+  }
+
   rpc CreateFile (HelloRequest) returns (HelloReply) {
     option (google.api.http) = {
       post: "/create"
@@ -33,5 +39,14 @@ message HelloRequest {
 
 // The response message containing the greetings
 message HelloReply {
-  string message = 1;
+  int32 status = 1;
+  string msg = 2;
+  repeated Item data = 3;
 }
+
+message Item{
+  string id = 1;
+  string audio = 2;
+}
+
+
