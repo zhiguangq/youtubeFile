@@ -20,10 +20,12 @@ var _ = binding.EncodeURL
 const _ = http.SupportPackageIsVersion1
 
 const OperationGreeterCreateFile = "/helloworld.v1.Greeter/CreateFile"
+const OperationGreeterGetFile = "/helloworld.v1.Greeter/GetFile"
 const OperationGreeterSayHello = "/helloworld.v1.Greeter/SayHello"
 
 type GreeterHTTPServer interface {
 	CreateFile(context.Context, *HelloRequest) (*HelloReply, error)
+	GetFile(context.Context, *HelloRequest) (*HelloReply, error)
 	// SayHello Sends a greeting
 	SayHello(context.Context, *HelloRequest) (*HelloReply, error)
 }
@@ -31,6 +33,7 @@ type GreeterHTTPServer interface {
 func RegisterGreeterHTTPServer(s *http.Server, srv GreeterHTTPServer) {
 	r := s.Route("/")
 	r.GET("/helloworld/{name}", _Greeter_SayHello0_HTTP_Handler(srv))
+	r.GET("/get", _Greeter_GetFile0_HTTP_Handler(srv))
 	r.POST("/create", _Greeter_CreateFile0_HTTP_Handler(srv))
 }
 
@@ -46,6 +49,25 @@ func _Greeter_SayHello0_HTTP_Handler(srv GreeterHTTPServer) func(ctx http.Contex
 		http.SetOperation(ctx, OperationGreeterSayHello)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.SayHello(ctx, req.(*HelloRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*HelloReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _Greeter_GetFile0_HTTP_Handler(srv GreeterHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in HelloRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationGreeterGetFile)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetFile(ctx, req.(*HelloRequest))
 		})
 		out, err := h(ctx, &in)
 		if err != nil {
@@ -80,6 +102,7 @@ func _Greeter_CreateFile0_HTTP_Handler(srv GreeterHTTPServer) func(ctx http.Cont
 
 type GreeterHTTPClient interface {
 	CreateFile(ctx context.Context, req *HelloRequest, opts ...http.CallOption) (rsp *HelloReply, err error)
+	GetFile(ctx context.Context, req *HelloRequest, opts ...http.CallOption) (rsp *HelloReply, err error)
 	SayHello(ctx context.Context, req *HelloRequest, opts ...http.CallOption) (rsp *HelloReply, err error)
 }
 
@@ -98,6 +121,19 @@ func (c *GreeterHTTPClientImpl) CreateFile(ctx context.Context, in *HelloRequest
 	opts = append(opts, http.Operation(OperationGreeterCreateFile))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, err
+}
+
+func (c *GreeterHTTPClientImpl) GetFile(ctx context.Context, in *HelloRequest, opts ...http.CallOption) (*HelloReply, error) {
+	var out HelloReply
+	pattern := "/get"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationGreeterGetFile))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {
 		return nil, err
 	}

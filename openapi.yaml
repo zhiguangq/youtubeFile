@@ -31,6 +31,29 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
+    /get:
+        get:
+            tags:
+                - Greeter
+            operationId: Greeter_GetFile
+            parameters:
+                - name: name
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/HelloReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
     /helloworld/{name}:
         get:
             tags:
@@ -69,8 +92,15 @@ components:
         HelloReply:
             type: object
             properties:
-                message:
+                status:
+                    type: integer
+                    format: int32
+                msg:
                     type: string
+                data:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Item'
             description: The response message containing the greetings
         HelloRequest:
             type: object
@@ -78,6 +108,13 @@ components:
                 name:
                     type: string
             description: The request message containing the user's name.
+        Item:
+            type: object
+            properties:
+                id:
+                    type: string
+                audio:
+                    type: string
         Status:
             type: object
             properties:
