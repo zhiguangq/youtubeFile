@@ -27,10 +27,15 @@ func NewGreeterService(uc *biz.GreeterUsecase) *GreeterService {
 }
 
 // SayHello implements helloworld.GreeterServer.
-func (s *GreeterService) SayHello(ctx context.Context, in *v1.HelloRequest) (*v1.HelloReply, error) {
+func (s *GreeterService) DelFile(ctx context.Context, in *v1.HelloRequest) (*v1.HelloReply, error) {
 	g, err := s.uc.CreateGreeter(ctx, &biz.Greeter{Hello: in.Name})
 	if err != nil {
 		return nil, err
+	}
+	var file string = "/var/www/html/myfile/"
+	err1 := os.Remove(file+g.Hello)
+	if err1 != nil{
+		fmt.Println("del err :%s",err1)
 	}
 	return &v1.HelloReply{Msg: "Hello " + g.Hello}, nil
 }

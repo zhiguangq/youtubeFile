@@ -7,7 +7,7 @@ info:
     description: The greeting service definition.
     version: 0.0.1
 paths:
-    /create:
+    /api/create:
         post:
             tags:
                 - Greeter
@@ -31,14 +31,16 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
-    /get:
+    /api/del/{name}:
         get:
             tags:
                 - Greeter
-            operationId: Greeter_GetFile
+            description: Sends a greeting
+            operationId: Greeter_DelFile
             parameters:
                 - name: name
-                  in: query
+                  in: path
+                  required: true
                   schema:
                     type: string
             responses:
@@ -54,16 +56,14 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
-    /helloworld/{name}:
+    /api/get:
         get:
             tags:
                 - Greeter
-            description: Sends a greeting
-            operationId: Greeter_SayHello
+            operationId: Greeter_GetFile
             parameters:
                 - name: name
-                  in: path
-                  required: true
+                  in: query
                   schema:
                     type: string
             responses:
